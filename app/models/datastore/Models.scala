@@ -1,10 +1,6 @@
 package models.datastore
 
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
-
-import org.joda.time.DateTime
-import play.api.libs.json._
 
 object Models {
 

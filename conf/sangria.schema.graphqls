@@ -1,0 +1,43 @@
+interface Node {
+    id: Int!
+}
+
+interface Named {
+    name: String!
+}
+
+interface TimeStamped {
+    created: String!
+    lastModified: String!
+}
+
+interface UserCreated {
+    createdBy: User!
+}
+
+type User implements Node, TimeStamped {
+    email: String!
+    firstName: String
+    lastName: String
+    threads: [Thread!]!
+    posts: [Post!]!
+}
+
+type ForumGroup implements Node, TimeStamped, Named {
+    forums: [Forum!]!
+}
+
+type Forum implements Node, TimeStamped, Named {
+    forumGroup: ForumGroup!
+    threads: [Thread!]!
+}
+
+type Thread implements Node, TimeStamped, Named, UserCreated {
+    forum: Forum!
+}
+
+type Post implements Node, TimeStamped, UserCreated {
+    content: String!
+    thread: Thread!
+    replyingTo: Post
+}
