@@ -3,14 +3,13 @@ package repositories
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import com.google.inject.ImplementedBy
 import models.datastore.Models.User
 import models.datastore.Tables
 import play.api.db.slick.DatabaseConfigProvider
 
 import scala.concurrent.Future
 
-@ImplementedBy(classOf[UserRepository])
+
 class UserRepository @Inject()(system: ActorSystem, dbConfProv: DatabaseConfigProvider)
   extends Repository(system, dbConfProv) {
 
