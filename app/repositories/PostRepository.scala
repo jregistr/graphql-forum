@@ -3,7 +3,7 @@ package repositories
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import models.datastore.Models.{Post, Thread}
+import models.datastore.Models.{Post, Thread, User}
 import models.datastore.Tables
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -24,5 +24,7 @@ class PostRepository @Inject()(system: ActorSystem, dbConfProv: DatabaseConfigPr
   def getByIds(ids: Seq[Long]): Future[Seq[Post]] = db.run(posts.filter(_.id inSet ids).result)
 
   def getForThread(thread: Thread): Future[Seq[Post]] = db.run(posts.filter(_.threadId === thread.id).result)
+
+  def getForUser(user: User): Future[Seq[Post]] = db.run(posts.filter(_.creatorId === user.id).result)
 
 }
