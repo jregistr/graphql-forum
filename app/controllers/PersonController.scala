@@ -7,10 +7,9 @@ import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
 
-class PersonController @Inject()(cc: ControllerComponents
-                                )(implicit ec: ExecutionContext)
+class PersonController @Inject()(cc: ControllerComponents)
+                                (implicit ec: ExecutionContext)
   extends AbstractController(cc) with I18nSupport {
-
   /**
    * The index action.
    */

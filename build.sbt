@@ -10,8 +10,7 @@ libraryDependencies += guice
 
 libraryDependencies += "com.typesafe.play" %% "play-slick" %  "3.0.0-M5"
 libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0-M5"
-libraryDependencies += "com.h2database" % "h2" % "1.4.194"
-
+libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
 
 libraryDependencies += specs2 % Test
   

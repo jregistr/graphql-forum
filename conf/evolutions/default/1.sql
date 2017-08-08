@@ -1,56 +1,53 @@
--- # --- !Ups
-CREATE TABLE "users" (
-  "id" INTEGER PRIMARY KEY AUTO_INCREMENT,
-  "first_name" VARCHAR(255) DEFAULT NULL,
-  "last_name" VARCHAR(255) DEFAULT NULL,
-  "email" VARCHAR(255) NOT NULL UNIQUE,
-  "date_created" TIMESTAMP NOT NULL,
-  "last_modified" TIMESTAMP NOT NULL
+# --- !Ups
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  first_name VARCHAR(255) DEFAULT NULL,
+  last_name VARCHAR(255) DEFAULT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  date_created TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_modified TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE "forum_groups"(
-  "id" INTEGER PRIMARY KEY AUTO_INCREMENT,
-  "name" VARCHAR(255) NOT NULL UNIQUE,
-  "date_created" TIMESTAMP NOT NULL,
-  "last_modified" TIMESTAMP NOT NULL
+CREATE TABLE forum_groups(
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE,
+  date_created TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_modified TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE "forums"(
-  "id" INTEGER PRIMARY KEY AUTO_INCREMENT,
-  "name" VARCHAR(255) NOT NULL UNIQUE,
-  "date_created" TIMESTAMP NOT NULL,
-  "last_modified" TIMESTAMP NOT NULL,
-  "group" INTEGER NOT NULL,
+CREATE TABLE forums(
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE,
+  date_created TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_modified TIMESTAMP NOT NULL DEFAULT NOW(),
+  group_id INTEGER NOT NULL,
 
-  FOREIGN KEY ("group") REFERENCES "forum_groups"("id")
+  CONSTRAINT fk_group_id FOREIGN KEY (group_id) REFERENCES forum_groups(id) ON DELETE CASCADE
 );
 
-CREATE TABLE "threads"(
-  "id" INTEGER PRIMARY KEY AUTO_INCREMENT,
-  "name" VARCHAR(255) NOT NULL UNIQUE,
-  "date_created" TIMESTAMP NOT NULL,
-  "last_modified" TIMESTAMP NOT NULL,
-  "forum" INTEGER NOT NULL,
-  "created_by" INTEGER NOT NULL,
+CREATE TABLE threads(
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE,
+  date_created TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_modified TIMESTAMP NOT NULL DEFAULT NOW(),
+  forum INTEGER NOT NULL,
+  created_by INTEGER NOT NULL,
 
-  FOREIGN KEY ("forum") REFERENCES "forums"("id"),
-  FOREIGN KEY ("created_by") REFERENCES "users"("id")
-);
-
-
-CREATE TABLE "posts"(
-  "id" INTEGER PRIMARY KEY AUTO_INCREMENT,
-  "date_created" TIMESTAMP NOT NULL,
-  "last_modified" TIMESTAMP NOT NULL,
-  "created_by" INTEGER NOT NULL,
-  "text" CLOB NOT NULL,
-  "replying_to" INTEGER DEFAULT NULL,
-
-  FOREIGN KEY ("created_by") REFERENCES "users"("id"),
-  FOREIGN KEY ("replying_to") REFERENCES "posts"("id")
+  CONSTRAINT fk_forum_id FOREIGN KEY (forum) REFERENCES forums(id) ON DELETE CASCADE,
+  CONSTRAINT fk_user_id FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
 
+CREATE TABLE posts(
+  id SERIAL PRIMARY KEY,
+  date_created TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_modified TIMESTAMP NOT NULL DEFAULT NOW(),
+  created_by INTEGER NOT NULL,
+  thread_id INTEGER NOT NULL,
+  content TEXT NOT NULL,
+  replying_to INTEGER DEFAULT NULL,
 
--- # --- !Downs
--- DROP TABLE IF EXISTS admin;
+  CONSTRAINT fk_thread_id FOREIGN KEY (thread_id) REFERENCES threads(id) ON DELETE CASCADE,
+  CONSTRAINT fk_user_id FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE ,
+  CONSTRAINT fk_replying_to_id FOREIGN KEY (replying_to) REFERENCES posts(id) ON DELETE SET NULL
+);
