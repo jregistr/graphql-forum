@@ -23,7 +23,7 @@ class ForumGroupsRepository @Inject()(system: ActorSystem, dbConfProv: DatabaseC
 
   def getByIds(ids: Seq[Long]): Future[Seq[ForumGroup]] = db.run(groups.filter(_.id inSet ids).result)
 
-  def getForumGroup(forum: Forum): Future[Option[ForumGroup]] =
-    db.run(groups.filter(_.id === forum.groupId).result.headOption)
+  def getForForum(forum: Forum): Future[ForumGroup] =
+    db.run(groups.filter(_.id === forum.groupId).result.headOption.map(_.get))
 
 }

@@ -3,7 +3,7 @@ package repositories
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import models.datastore.Models.User
+import models.datastore.Models.{User, UserCreated}
 import models.datastore.Tables
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -23,5 +23,8 @@ class UserRepository @Inject()(system: ActorSystem, dbConfProv: DatabaseConfigPr
   def getById(id: Long): Future[Option[User]] = db.run(users.filter(_.id === id).result.headOption)
 
   def getByIds(ids: Seq[Long]): Future[Seq[User]] = db.run(users.filter(_.id inSet ids).result)
+
+  def getForUserCreated(userCreated: UserCreated): Future[User] =
+    db.run(users.filter(_.id === userCreated.creatorId).result.headOption.map(_.get))
 
 }

@@ -14,7 +14,7 @@ class InterfaceTypeDefinitions @Inject()(private implicit val executionContext: 
 
   private val dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss.SSS")
 
-  val nodeInterface: InterfaceType[Unit, Node] =
+  val NodeInterface: InterfaceType[Unit, Node] =
     InterfaceType(
       "Node",
       "Base interface representing an object with an ID",
@@ -23,7 +23,7 @@ class InterfaceTypeDefinitions @Inject()(private implicit val executionContext: 
       )
     )
 
-  val namedInterface: InterfaceType[Unit, NamedModel] =
+  val NamedInterface: InterfaceType[Unit, NamedModel] =
     InterfaceType(
       "Named",
       "An object with a unique name",
@@ -32,7 +32,7 @@ class InterfaceTypeDefinitions @Inject()(private implicit val executionContext: 
       )
     )
 
-  val timeStampedInterface: InterfaceType[Unit, TimeStamped] =
+  val TimeStampedInterface: InterfaceType[Unit, TimeStamped] =
     InterfaceType(
       "TimeStamped",
       "An object with timestamp for date created and last modified fields",
