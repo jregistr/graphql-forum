@@ -44,7 +44,7 @@ class InterfaceTypeDefinitions @Inject()(private implicit val executionContext: 
 
   def idField[T <: Node]: Field[Unit, T] = Field(
     "id",
-    IntType,
+    LongType,
     Some("unique incrementing identifier for this Node"),
     resolve = _.value.id
   )
