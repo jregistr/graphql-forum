@@ -72,9 +72,8 @@ type Query {
     user(id: Int!): User
 
     forumGroups: [ForumGroup]
-    forumGroup(id: Int): ForumGroup
+    forumGroup(id: Int!): ForumGroup
 
     forums: [Forum]
-    forums(forumGroupId: Int): [Forum]
-    forum(id: Int): Forum
+    forum(id: Int!): Forum
 }

@@ -6,7 +6,7 @@ import models.datastore.Models.{Forum, ForumGroup, Post, Thread, User, UserCreat
 import repositories._
 import sangria.schema._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
                                 userRepository: UserRepository,
@@ -190,10 +190,59 @@ class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
         Some("The post this one is replying to."),
         resolve = ctx => ctx.value.replyingToId match {
           case Some(targetId) => postRepository.getById(targetId)
-          case _ => None
+          case _ => Future.successful(None)
         }
       )
     )
   )
+
+  lazy val idArgument: Argument[Long] = Argument(
+    "id",
+    LongType
+  )
+
+  lazy val QueryDefinition: ObjectType[Unit, Unit] = ObjectType(
+    "query",
+    fields[Unit, Unit](
+      Field(
+        "users",
+        ListType(UserDefinition),
+        arguments = Nil,
+        resolve = _ => userRepository.all
+      ),
+      Field(
+        "user",
+        UserDefinition,
+        arguments = List(idArgument),
+        resolve = ctx => userRepository.getById(ctx.arg[Long](idArgument))
+      ),
+      Field(
+        "forumGroups",
+        ListType(ForumGroupDefinition),
+        arguments = Nil,
+        resolve = _ => forumGroupsRepo.all
+      ),
+      Field(
+        "forumGroup",
+        ForumGroupDefinition,
+        arguments = List(idArgument),
+        resolve = ctx => forumGroupsRepo.getById(ctx.arg(idArgument))
+      ),
+      Field(
+        "forums",
+        ListType(ForumDefinition),
+        arguments = Nil,
+        resolve = _ => forumRepository.all
+      ),
+      Field(
+        "forum",
+        ForumDefinition,
+        arguments = List(idArgument),
+        resolve = ctx => forumRepository.getById(ctx.arg(idArgument))
+      )
+    )
+  )
+
+  lazy val forumSchema = Schema(QueryDefinition)
 
 }
