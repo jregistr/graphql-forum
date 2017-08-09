@@ -23,58 +23,58 @@ type User implements Node, TimeStamped {
     email: String!
     firstName: String
     lastName: String
-    threads: [Thread!]!
-    posts: [Post!]!
+#    threads: [Thread!]!
+#    posts: [Post!]!
 }
 
-type ForumGroup implements Node, TimeStamped, Named {
-    id: Int!
-    name: String!
-    created: String!
-    lastModified: String!
-
-    forums: [Forum!]!
-}
-
-type Forum implements Node, TimeStamped, Named {
-    id: Int!
-    name: String!
-    created: String!
-    lastModified: String!
-
-    forumGroup: ForumGroup!
-    threads: [Thread!]!
-}
-
-type Thread implements Node, TimeStamped, Named, UserCreated {
-    id: Int!
-    name: String!
-    created: String!
-    lastModified: String!
-    createdBy: User!
-
-    forum: Forum!
-    posts: [Post]
-}
-
-type Post implements Node, TimeStamped, UserCreated {
-    id: Int!
-    created: String!
-    lastModified: String!
-    createdBy: User!
-
-    content: String!
-    thread: Thread!
-    replyingTo: Post
-}
-
-type Query {
-    users: [User]
-    user(id: Int!): User
-
-    forumGroups: [ForumGroup]
-    forumGroup(id: Int!): ForumGroup
-
-    forums: [Forum]
-    forum(id: Int!): Forum
-}
+#type ForumGroup implements Node, TimeStamped, Named {
+#    id: Int!
+#    name: String!
+#    created: String!
+#    lastModified: String!
+#
+#    forums: [Forum!]!
+#}
+#
+#type Forum implements Node, TimeStamped, Named {
+#    id: Int!
+#    name: String!
+#    created: String!
+#    lastModified: String!
+#
+#    forumGroup: ForumGroup!
+#    threads: [Thread!]!
+#}
+#
+#type Thread implements Node, TimeStamped, Named, UserCreated {
+#    id: Int!
+#    name: String!
+#    created: String!
+#    lastModified: String!
+#    createdBy: User!
+#
+#    forum: Forum!
+#    posts: [Post]
+#}
+#
+#type Post implements Node, TimeStamped, UserCreated {
+#    id: Int!
+#    created: String!
+#    lastModified: String!
+#    createdBy: User!
+#
+#    content: String!
+#    thread: Thread!
+#    replyingTo: Post
+#}
+#
+#type Query {
+#    users: [User]
+#    user(id: Int!): User
+#
+#    forumGroups: [ForumGroup]
+#    forumGroup(id: Int!): ForumGroup
+#
+#    forums: [Forum]
+#    forum(id: Int!): Forum
+#}

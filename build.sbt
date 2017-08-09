@@ -13,6 +13,8 @@ libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0-M
 libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
 
 libraryDependencies += "org.sangria-graphql" % "sangria_2.12" % "1.2.2"
+libraryDependencies += "org.sangria-graphql" % "sangria-play-json_2.12" % "1.0.3"
+
 
 libraryDependencies += specs2 % Test
   

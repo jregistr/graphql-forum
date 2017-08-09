@@ -51,193 +51,195 @@ class TypeDefinitions @Inject()(val interfacesDefs: InterfaceTypeDefinitions,
         OptionType(StringType),
         Some("The user's last name"),
         resolve = _.value.lastName
-      ),
-      Field(
-        "threads",
-        ListType(ThreadDefinition),
-        Some("The threads created by this user"),
-        resolve = ctx => threadRepository.getAllByUser(ctx.value)
-      ),
-      Field(
-        "posts",
-        ListType(PostDefinition),
-        Some("The posts made by this user"),
-        resolve = ctx => postRepository.getForUser(ctx.value)
       )
+//      ,
+//      Field(
+//        "threads",
+//        ListType(ThreadDefinition),
+//        Some("The threads created by this user"),
+//        resolve = ctx => threadRepository.getAllByUser(ctx.value)
+//      ),
+//      Field(
+//        "posts",
+//        ListType(PostDefinition),
+//        Some("The posts made by this user"),
+//        resolve = ctx => postRepository.getForUser(ctx.value)
+//      )
     )
   )
 
-  lazy val ForumGroupDefinition: ObjectType[Unit, ForumGroup] = ObjectType(
-    "ForumGroup",
-    "A group of common forums",
-    interfaces[Unit, ForumGroup](
-      interfacesDefs.NodeInterface,
-      interfacesDefs.TimeStampedInterface,
-      interfacesDefs.NamedInterface
-    ),
-
-    fields[Unit, ForumGroup](
-      interfacesDefs.idField[ForumGroup],
-      interfacesDefs.namedField[ForumGroup],
-      interfacesDefs.createdField[ForumGroup],
-      interfacesDefs.lastModifiedField[ForumGroup],
-
-      Field(
-        "forums",
-        ListType(ForumDefinition),
-        Some("Forums that belong to this group"),
-        resolve = ctx => forumRepository.getAllByForumGroup(ctx.value)
-      )
-    )
-  )
-
-  lazy val ForumDefinition: ObjectType[Unit, Forum] = ObjectType(
-    "Forum",
-    "A forum for threads",
-    interfaces[Unit, Forum](
-      interfacesDefs.NodeInterface,
-      interfacesDefs.TimeStampedInterface,
-      interfacesDefs.NamedInterface
-    ),
-
-    fields[Unit, Forum](
-      interfacesDefs.idField[Forum],
-      interfacesDefs.createdField[Forum],
-      interfacesDefs.lastModifiedField[Forum],
-      interfacesDefs.namedField[Forum],
-
-      Field(
-        "forumGroup",
-        ForumGroupDefinition,
-        Some("The forum group this forum belongs to."),
-        resolve = ctx => forumGroupsRepo.getForForum(ctx.value)
-      ),
-
-      Field(
-        "threads",
-        ListType(ThreadDefinition),
-        Some("The threads belonging to this forum"),
-        resolve = ctx => threadRepository.getAllByForum(ctx.value)
-      )
-    )
-  )
-
-  lazy val ThreadDefinition: ObjectType[Unit, Thread] = ObjectType(
-    "Thread",
-    "A discussion thread created by a user",
-    interfaces[Unit, Thread](
-      interfacesDefs.NodeInterface,
-      interfacesDefs.TimeStampedInterface,
-      interfacesDefs.NamedInterface,
-      UserCreatedInterface
-    ),
-
-    fields[Unit, Thread](
-      interfacesDefs.idField[Thread],
-      interfacesDefs.createdField[Thread],
-      interfacesDefs.lastModifiedField[Thread],
-      interfacesDefs.namedField[Thread],
-      createdByField[Thread],
-
-      Field(
-        "forum",
-        ForumDefinition,
-        Some("The forum this thread belongs to."),
-        resolve = ctx => forumRepository.getForThread(ctx.value)
-      ),
-      Field(
-        "posts",
-        ListType(PostDefinition),
-        Some("The posts that have been made to this thread."),
-        resolve = ctx => postRepository.getForThread(ctx.value)
-      )
-    )
-  )
-
-  lazy val PostDefinition: ObjectType[Unit, Post] = ObjectType(
-    "Post",
-    "A post made to a thread by a user",
-    interfaces[Unit, Post](
-      interfacesDefs.NodeInterface,
-      interfacesDefs.TimeStampedInterface,
-      UserCreatedInterface
-    ),
-
-    fields[Unit, Post](
-      interfacesDefs.idField[Post],
-      interfacesDefs.createdField[Post],
-      interfacesDefs.lastModifiedField[Post],
-      createdByField[Post],
-
-      Field(
-        "content",
-        StringType,
-        resolve = _.value.content
-      ),
-
-      Field(
-        "thread",
-        ThreadDefinition,
-        Some("The thread this post belongs to."),
-        resolve = ctx => threadRepository.getForPost(ctx.value)
-      ),
-
-      Field(
-        "replyingTo",
-        OptionType(PostDefinition),
-        Some("The post this one is replying to."),
-        resolve = ctx => ctx.value.replyingToId match {
-          case Some(targetId) => postRepository.getById(targetId)
-          case _ => Future.successful(None)
-        }
-      )
-    )
-  )
+//  lazy val ForumGroupDefinition: ObjectType[Unit, ForumGroup] = ObjectType(
+//    "ForumGroup",
+//    "A group of common forums",
+//    interfaces[Unit, ForumGroup](
+//      interfacesDefs.NodeInterface,
+//      interfacesDefs.TimeStampedInterface,
+//      interfacesDefs.NamedInterface
+//    ),
+//
+//    fields[Unit, ForumGroup](
+//      interfacesDefs.idField[ForumGroup],
+//      interfacesDefs.namedField[ForumGroup],
+//      interfacesDefs.createdField[ForumGroup],
+//      interfacesDefs.lastModifiedField[ForumGroup],
+//
+//      Field(
+//        "forums",
+//        ListType(ForumDefinition),
+//        Some("Forums that belong to this group"),
+//        resolve = ctx => forumRepository.getAllByForumGroup(ctx.value)
+//      )
+//    )
+//  )
+//
+//  lazy val ForumDefinition: ObjectType[Unit, Forum] = ObjectType(
+//    "Forum",
+//    "A forum for threads",
+//    interfaces[Unit, Forum](
+//      interfacesDefs.NodeInterface,
+//      interfacesDefs.TimeStampedInterface,
+//      interfacesDefs.NamedInterface
+//    ),
+//
+//    fields[Unit, Forum](
+//      interfacesDefs.idField[Forum],
+//      interfacesDefs.createdField[Forum],
+//      interfacesDefs.lastModifiedField[Forum],
+//      interfacesDefs.namedField[Forum],
+//
+//      Field(
+//        "forumGroup",
+//        ForumGroupDefinition,
+//        Some("The forum group this forum belongs to."),
+//        resolve = ctx => forumGroupsRepo.getForForum(ctx.value)
+//      ),
+//
+//      Field(
+//        "threads",
+//        ListType(ThreadDefinition),
+//        Some("The threads belonging to this forum"),
+//        resolve = ctx => threadRepository.getAllByForum(ctx.value)
+//      )
+//    )
+//  )
+//
+//  lazy val ThreadDefinition: ObjectType[Unit, Thread] = ObjectType(
+//    "Thread",
+//    "A discussion thread created by a user",
+//    interfaces[Unit, Thread](
+//      interfacesDefs.NodeInterface,
+//      interfacesDefs.TimeStampedInterface,
+//      interfacesDefs.NamedInterface,
+//      UserCreatedInterface
+//    ),
+//
+//    fields[Unit, Thread](
+//      interfacesDefs.idField[Thread],
+//      interfacesDefs.createdField[Thread],
+//      interfacesDefs.lastModifiedField[Thread],
+//      interfacesDefs.namedField[Thread],
+//      createdByField[Thread],
+//
+//      Field(
+//        "forum",
+//        ForumDefinition,
+//        Some("The forum this thread belongs to."),
+//        resolve = ctx => forumRepository.getForThread(ctx.value)
+//      ),
+//      Field(
+//        "posts",
+//        ListType(PostDefinition),
+//        Some("The posts that have been made to this thread."),
+//        resolve = ctx => postRepository.getForThread(ctx.value)
+//      )
+//    )
+//  )
+//
+//  lazy val PostDefinition: ObjectType[Unit, Post] = ObjectType(
+//    "Post",
+//    "A post made to a thread by a user",
+//    interfaces[Unit, Post](
+//      interfacesDefs.NodeInterface,
+//      interfacesDefs.TimeStampedInterface,
+//      UserCreatedInterface
+//    ),
+//
+//    fields[Unit, Post](
+//      interfacesDefs.idField[Post],
+//      interfacesDefs.createdField[Post],
+//      interfacesDefs.lastModifiedField[Post],
+//      createdByField[Post],
+//
+//      Field(
+//        "content",
+//        StringType,
+//        resolve = _.value.content
+//      ),
+//
+//      Field(
+//        "thread",
+//        ThreadDefinition,
+//        Some("The thread this post belongs to."),
+//        resolve = ctx => threadRepository.getForPost(ctx.value)
+//      ),
+//
+//      Field(
+//        "replyingTo",
+//        OptionType(PostDefinition),
+//        Some("The post this one is replying to."),
+//        resolve = ctx => ctx.value.replyingToId match {
+//          case Some(targetId) => postRepository.getById(targetId)
+//          case _ => Future.successful(None)
+//        }
+//      )
+//    )
+//  )
 
   lazy val idArgument: Argument[Long] = Argument(
     "id",
     LongType
   )
 
-  lazy val QueryDefinition: ObjectType[Unit, Unit] = ObjectType(
+  lazy val QueryDefinition: ObjectType[TypeDefinitions, Unit] = ObjectType(
     "query",
-    fields[Unit, Unit](
+    fields[TypeDefinitions, Unit](
       Field(
         "users",
         ListType(UserDefinition),
         arguments = Nil,
-        resolve = _ => userRepository.all
+        resolve = ctx => ctx.ctx.userRepository.all
       ),
       Field(
         "user",
         OptionType(UserDefinition),
         arguments = List(idArgument),
-        resolve = ctx => userRepository.getById(ctx.arg[Long](idArgument))
-      ),
-      Field(
-        "forumGroups",
-        ListType(ForumGroupDefinition),
-        arguments = Nil,
-        resolve = _ => forumGroupsRepo.all
-      ),
-      Field(
-        "forumGroup",
-        OptionType(ForumGroupDefinition),
-        arguments = List(idArgument),
-        resolve = ctx => forumGroupsRepo.getById(ctx.arg(idArgument))
-      ),
-      Field(
-        "forums",
-        ListType(ForumDefinition),
-        arguments = Nil,
-        resolve = _ => forumRepository.all
-      ),
-      Field(
-        "forum",
-        OptionType(ForumDefinition),
-        arguments = List(idArgument),
-        resolve = ctx => forumRepository.getById(ctx.arg(idArgument))
+        resolve = ctx => ctx.ctx.userRepository.getById(ctx.arg[Long](idArgument))
       )
+//      ,
+//      Field(
+//        "forumGroups",
+//        ListType(ForumGroupDefinition),
+//        arguments = Nil,
+//        resolve = ctx => ctx.value.forumGroupsRepo.all
+//      ),
+//      Field(
+//        "forumGroup",
+//        OptionType(ForumGroupDefinition),
+//        arguments = List(idArgument),
+//        resolve = ctx => ctx.value.forumGroupsRepo.getById(ctx.arg(idArgument))
+//      ),
+//      Field(
+//        "forums",
+//        ListType(ForumDefinition),
+//        arguments = Nil,
+//        resolve = ctx => ctx.value.forumRepository.all
+//      ),
+//      Field(
+//        "forum",
+//        OptionType(ForumDefinition),
+//        arguments = List(idArgument),
+//        resolve = ctx => ctx.value.forumRepository.getById(ctx.arg(idArgument))
+//      )
     )
   )
 
