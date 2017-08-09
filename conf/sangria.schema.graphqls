@@ -11,10 +11,6 @@ interface TimeStamped {
     lastModified: String!
 }
 
-interface UserCreated {
-    createdBy: User!
-}
-
 type User implements Node, TimeStamped {
     id: Int!
     created: String!
@@ -46,7 +42,7 @@ type Forum implements Node, TimeStamped, Named {
     threads: [Thread!]!
 }
 
-type Thread implements Node, TimeStamped, Named, UserCreated {
+type Thread implements Node, TimeStamped, Named {
     id: Int!
     name: String!
     created: String!
@@ -56,7 +52,7 @@ type Thread implements Node, TimeStamped, Named, UserCreated {
     forum: Forum!
 }
 
-type Post implements Node, TimeStamped, UserCreated {
+type Post implements Node, TimeStamped {
     id: Int!
     created: String!
     lastModified: String!
