@@ -1,5 +1,5 @@
 interface Node {
-    id: ID!
+    id: Int!
 }
 
 interface Named {
@@ -16,7 +16,7 @@ interface UserCreated {
 }
 
 type User implements Node, TimeStamped {
-    id: ID!
+    id: Int!
     created: String!
     lastModified: String!
 
@@ -28,7 +28,7 @@ type User implements Node, TimeStamped {
 }
 
 type ForumGroup implements Node, TimeStamped, Named {
-    id: ID!
+    id: Int!
     name: String!
     created: String!
     lastModified: String!
@@ -37,7 +37,7 @@ type ForumGroup implements Node, TimeStamped, Named {
 }
 
 type Forum implements Node, TimeStamped, Named {
-    id: ID!
+    id: Int!
     name: String!
     created: String!
     lastModified: String!
@@ -47,7 +47,7 @@ type Forum implements Node, TimeStamped, Named {
 }
 
 type Thread implements Node, TimeStamped, Named, UserCreated {
-    id: ID!
+    id: Int!
     name: String!
     created: String!
     lastModified: String!
@@ -57,7 +57,7 @@ type Thread implements Node, TimeStamped, Named, UserCreated {
 }
 
 type Post implements Node, TimeStamped, UserCreated {
-    id: ID!
+    id: Int!
     created: String!
     lastModified: String!
     createdBy: User!
@@ -69,12 +69,12 @@ type Post implements Node, TimeStamped, UserCreated {
 
 type Query {
     users: [User]
-    user(id: ID!): User
+    user(id: Int!): User
 
     forumGroups: [ForumGroup]
-    forumGroup(id: ID): ForumGroup
+    forumGroup(id: Int): ForumGroup
 
     forums: [Forum]
-    forums(forumGroupId: ID): [Forum]
-    forum(id: ID): Forum
+    forums(forumGroupId: Int): [Forum]
+    forum(id: Int): Forum
 }
