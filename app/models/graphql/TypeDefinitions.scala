@@ -8,16 +8,15 @@ import sangria.schema._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
-                                userRepository: UserRepository,
-                                forumGroupsRepo: ForumGroupsRepository,
-                                forumRepository: ForumRepository,
-                                threadRepository: ThreadRepository,
-                                postRepository: PostRepository)
+class TypeDefinitions @Inject()(val interfacesDefs: InterfaceTypeDefinitions,
+                                val userRepository: UserRepository,
+                                val forumGroupsRepo: ForumGroupsRepository,
+                                val forumRepository: ForumRepository,
+                                val threadRepository: ThreadRepository,
+                                val postRepository: PostRepository)
                                (implicit val executionContext: ExecutionContext) {
 
-
-  val UserCreatedInterface: InterfaceType[Unit, UserCreated] =
+  lazy val UserCreatedInterface: InterfaceType[Unit, UserCreated] =
     InterfaceType(
       "UserCreated",
       "An object that is created by a user.",
@@ -25,13 +24,6 @@ class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
         createdByField[UserCreated]
       )
     )
-
-  def createdByField[T <: UserCreated]: Field[Unit, T] = Field(
-    "createdBy",
-    UserDefinition,
-    Some("The user that created this thread"),
-    resolve = ctx => userRepository.getForUserCreated(ctx.value)
-  )
 
   lazy val UserDefinition: ObjectType[Unit, User] = ObjectType(
     "User",
@@ -152,6 +144,12 @@ class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
         ForumDefinition,
         Some("The forum this thread belongs to."),
         resolve = ctx => forumRepository.getForThread(ctx.value)
+      ),
+      Field(
+        "posts",
+        ListType(PostDefinition),
+        Some("The posts that have been made to this thread."),
+        resolve = ctx => postRepository.getForThread(ctx.value)
       )
     )
   )
@@ -212,7 +210,7 @@ class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
       ),
       Field(
         "user",
-        UserDefinition,
+        OptionType(UserDefinition),
         arguments = List(idArgument),
         resolve = ctx => userRepository.getById(ctx.arg[Long](idArgument))
       ),
@@ -224,7 +222,7 @@ class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
       ),
       Field(
         "forumGroup",
-        ForumGroupDefinition,
+        OptionType(ForumGroupDefinition),
         arguments = List(idArgument),
         resolve = ctx => forumGroupsRepo.getById(ctx.arg(idArgument))
       ),
@@ -236,7 +234,7 @@ class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
       ),
       Field(
         "forum",
-        ForumDefinition,
+        OptionType(ForumDefinition),
         arguments = List(idArgument),
         resolve = ctx => forumRepository.getById(ctx.arg(idArgument))
       )
@@ -244,5 +242,12 @@ class TypeDefinitions @Inject()(interfacesDefs: InterfaceTypeDefinitions,
   )
 
   lazy val forumSchema = Schema(QueryDefinition)
+
+  private def createdByField[T <: UserCreated]: Field[Unit, T] = Field(
+    "createdBy",
+    UserDefinition,
+    Some("The user that created this thread"),
+    resolve = ctx => userRepository.getForUserCreated(ctx.value)
+  )
 
 }

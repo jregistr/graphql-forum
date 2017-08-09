@@ -54,6 +54,7 @@ type Thread implements Node, TimeStamped, Named, UserCreated {
     createdBy: User!
 
     forum: Forum!
+    posts: [Post]
 }
 
 type Post implements Node, TimeStamped, UserCreated {
