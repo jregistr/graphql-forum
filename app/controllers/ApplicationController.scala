@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import models.graphql.TypeDefinitions
-import play.api.libs.json.{JsNumber, JsObject, JsString, Json}
+import play.api.libs.json._
 import play.api.mvc._
 import sangria.execution.{ErrorWithResolver, Executor, QueryAnalysisError}
 import sangria.marshalling.playJson._
@@ -17,16 +17,33 @@ class ApplicationController @Inject()(cc: ControllerComponents,
                                       typeDefs: TypeDefinitions)
                                      (implicit val exContext: ExecutionContext) extends AbstractController(cc) {
   def index = Action {
-    Ok("Not yet implemented")
+    Ok(views.html.graphiql("Interactive Forum"))
   }
 
   def renderSchema = Action {
     Ok(SchemaRenderer.renderSchema(typeDefs.forumSchema))
   }
 
-  def graphQl(query: String, variables: Option[String], operation: Option[String]): Action[AnyContent] = Action.async {
-    val vars = variables.map(parseVariables)
-    executeQuery(query, vars, operation)
+  def graphQl: Action[AnyContent] = Action.async { implicit request =>
+    request.body.asJson match {
+      case Some(body) =>
+        val query = (body \ "query").as[String]
+
+        val rawVars = body \ "variables"
+        val vars = rawVars match {
+          case _: JsUndefined => None
+          case JsDefined(JsNull) => None
+          case t: JsDefined => Some(t.as[JsObject])
+        }
+        val operation = (body \ "operationName").toOption.map(_.as[String])
+
+        executeQuery(query, vars, operation)
+      case None => Future {
+        BadRequest(JsObject(Seq(
+          "error" -> JsString("Missing query")
+        )))
+      }
+    }
   }
 
   private def executeQuery(query: String, vars: Option[JsObject], operation: Option[String]) =
@@ -54,6 +71,6 @@ class ApplicationController @Inject()(cc: ControllerComponents,
     }
 
   private def parseVariables(vars: String) =
-    if(vars.trim == "" || vars.trim == "null") Json.obj() else Json.parse(vars).as[JsObject]
+    if (vars.trim == "" || vars.trim == "null") Json.obj() else Json.parse(vars).as[JsObject]
 
 }
