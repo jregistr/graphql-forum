@@ -3,6 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import models.graphql.TypeDefinitions
+import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
 import sangria.execution.{ErrorWithResolver, Executor, QueryAnalysisError}
@@ -11,11 +12,14 @@ import sangria.parser.{QueryParser, SyntaxError}
 import sangria.renderer.SchemaRenderer
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class ApplicationController @Inject()(cc: ControllerComponents,
                                       typeDefs: TypeDefinitions)
                                      (implicit val exContext: ExecutionContext) extends AbstractController(cc) {
+
+  private val logger = Logger(classOf[ApplicationController])
+
   def index = Action {
     Ok(views.html.graphiql("Interactive Forum"))
   }
@@ -26,21 +30,24 @@ class ApplicationController @Inject()(cc: ControllerComponents,
 
   def graphQl: Action[AnyContent] = Action.async { implicit request =>
     request.body.asJson match {
-      case Some(body) =>
+      case Some(body: JsObject) =>
         val query = (body \ "query").as[String]
 
-        val rawVars = body \ "variables"
-        val vars = rawVars match {
-          case _: JsUndefined => None
-          case JsDefined(JsNull) => None
-          case t: JsDefined => Some(t.as[JsObject])
-        }
         val operation = (body \ "operationName").toOption.map(_.as[String])
-
-        executeQuery(query, vars, operation)
-      case None => Future {
+        parseVariables(body) match {
+          case Success(vars) => executeQuery(query, vars, operation)
+          case Failure(_: JsResultException) => Future.successful(BadRequest(JsObject(Seq(
+            "error" -> JsString("failed to read variables as a Json Object")
+          ))))
+          case Failure(t: _) =>
+            logger.error("Error parsing variables", t)
+            Future.successful(InternalServerError(JsObject(Seq(
+              "error" -> JsString("Internal server error while parsing variables")
+            ))))
+        }
+      case _ => Future {
         BadRequest(JsObject(Seq(
-          "error" -> JsString("Missing query")
+          "error" -> JsString("Missing request body")
         )))
       }
     }
@@ -70,7 +77,13 @@ class ApplicationController @Inject()(cc: ControllerComponents,
       case Failure(e) => throw e
     }
 
-  private def parseVariables(vars: String) =
-    if (vars.trim == "" || vars.trim == "null") Json.obj() else Json.parse(vars).as[JsObject]
+  private def parseVariables(body: JsObject): Try[Option[JsObject]] = {
+    val rawVars = body \ "variables"
+    rawVars match {
+      case _: JsUndefined => Success(None)
+      case JsDefined(JsNull) => Success(None)
+      case t: JsDefined => Try(Some(t.as[JsObject]))
+    }
+  }
 
 }
