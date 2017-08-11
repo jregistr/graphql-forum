@@ -39,7 +39,7 @@ class ApplicationController @Inject()(cc: ControllerComponents,
           case Failure(_: JsResultException) => Future.successful(BadRequest(JsObject(Seq(
             "error" -> JsString("failed to read variables as a Json Object")
           ))))
-          case Failure(t: _) =>
+          case Failure(t) =>
             logger.error("Error parsing variables", t)
             Future.successful(InternalServerError(JsObject(Seq(
               "error" -> JsString("Internal server error while parsing variables")
