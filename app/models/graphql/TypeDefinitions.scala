@@ -3,10 +3,7 @@ package models.graphql
 import javax.inject.Inject
 
 import models.datastore.Models.{Forum, ForumGroup, Post, Thread, User, UserCreated}
-import org.postgresql.util.PSQLException
 import repositories._
-import sangria.execution.ErrorWithResolver
-import sangria.execution.Executor.ExceptionHandler
 import sangria.schema._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -249,27 +246,38 @@ class TypeDefinitions @Inject()(val interfacesDefs: InterfaceTypeDefinitions,
         OptionType(ForumDefinition),
         arguments = List(idArgument),
         resolve = ctx => ctx.ctx.forumRepository.getById(ctx.arg(idArgument))
+      ),
+      Field(
+        "threads",
+        ListType(ThreadDefinition),
+        arguments = Nil,
+        resolve = ctx => ctx.ctx.threadRepository.all
+      ),
+      Field(
+        "thread",
+        OptionType(ThreadDefinition),
+        arguments = List(idArgument),
+        resolve = ctx => ctx.ctx.threadRepository.getById(ctx.arg(idArgument))
       )
     )
   )
 
   lazy val MutationDefinition: ObjectType[TypeDefinitions, Unit] = {
+    val postContentArg = Argument(
+      "postContent",
+      StringType
+    )
+
     ObjectType(
       "mutation",
       fields[TypeDefinitions, Unit](
         {
-          val (forumArg, contentArg) = (
-            Argument(
-              "forumId",
-              LongType
-            ),
-            Argument(
-              "postContent",
-              StringType
-            )
+          val forumArg = Argument(
+            "forumId",
+            LongType
           )
 
-          val args = List(creatorArgument, forumArg, nameArgument, contentArg)
+          val args = List(creatorArgument, forumArg, nameArgument, postContentArg)
           Field(
             "createThread",
             ThreadDefinition,
@@ -278,7 +286,29 @@ class TypeDefinitions @Inject()(val interfacesDefs: InterfaceTypeDefinitions,
               ctx.arg(creatorArgument),
               ctx.arg(forumArg),
               ctx.arg(nameArgument),
-              ctx.arg(contentArg)
+              ctx.arg(postContentArg)
+            )
+          )
+        }, {
+          val replyingToArg = Argument(
+            "replyingTo",
+            OptionInputType(LongType)
+          )
+
+          val threadIdArg = Argument(
+            "threadId",
+            LongType
+          )
+
+          Field(
+            "createPost",
+            PostDefinition,
+            arguments = List(threadIdArg, creatorArgument, postContentArg, replyingToArg),
+            resolve = ctx => ctx.ctx.postRepository.createPost(
+              ctx.arg(postContentArg),
+              ctx.arg(threadIdArg),
+              ctx.arg(creatorArgument),
+              ctx.arg(replyingToArg)
             )
           )
         }
