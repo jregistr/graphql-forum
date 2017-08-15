@@ -3,7 +3,10 @@ package models.graphql
 import javax.inject.Inject
 
 import models.datastore.Models.{Forum, ForumGroup, Post, Thread, User, UserCreated}
+import org.postgresql.util.PSQLException
 import repositories._
+import sangria.execution.ErrorWithResolver
+import sangria.execution.Executor.ExceptionHandler
 import sangria.schema._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -198,6 +201,16 @@ class TypeDefinitions @Inject()(val interfacesDefs: InterfaceTypeDefinitions,
     LongType
   )
 
+  lazy val nameArgument: Argument[String] = Argument(
+    "name",
+    StringType
+  )
+
+  lazy val creatorArgument: Argument[Long] = Argument(
+    "creatorId",
+    LongType
+  )
+
   lazy val QueryDefinition: ObjectType[TypeDefinitions, Unit] = ObjectType(
     "query",
     fields[TypeDefinitions, Unit](
@@ -240,7 +253,40 @@ class TypeDefinitions @Inject()(val interfacesDefs: InterfaceTypeDefinitions,
     )
   )
 
-  lazy val forumSchema = Schema(QueryDefinition)
+  lazy val MutationDefinition: ObjectType[TypeDefinitions, Unit] = {
+    ObjectType(
+      "mutation",
+      fields[TypeDefinitions, Unit](
+        {
+          val (forumArg, contentArg) = (
+            Argument(
+              "forumId",
+              LongType
+            ),
+            Argument(
+              "postContent",
+              StringType
+            )
+          )
+
+          val args = List(creatorArgument, forumArg, nameArgument, contentArg)
+          Field(
+            "createThread",
+            ThreadDefinition,
+            arguments = args,
+            resolve = ctx => ctx.ctx.threadRepository.createThread(
+              ctx.arg(creatorArgument),
+              ctx.arg(forumArg),
+              ctx.arg(nameArgument),
+              ctx.arg(contentArg)
+            )
+          )
+        }
+      )
+    )
+  }
+
+  lazy val forumSchema = Schema(QueryDefinition, mutation = Some(MutationDefinition))
 
   private def createdByField[T <: UserCreated]: Field[Unit, T] = Field(
     "createdBy",

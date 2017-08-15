@@ -56,7 +56,7 @@ object Models {
   case class Post(content: String,
                   threadId: Long,
                   creatorId: Long,
-                  replyingToId: Option[Long],
+                  replyingToId: Option[Long] = None,
                   id: Long = -1,
                   created: Timestamp = new Timestamp(System.currentTimeMillis()),
                   lastModified: Timestamp = new Timestamp(System.currentTimeMillis()))

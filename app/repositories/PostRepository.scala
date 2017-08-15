@@ -27,4 +27,12 @@ class PostRepository @Inject()(system: ActorSystem, dbConfProv: DatabaseConfigPr
 
   def getForUser(user: User): Future[Seq[Post]] = db.run(posts.filter(_.creatorId === user.id).result)
 
+  def createPost(content: String, threadId: Long, creatorId: Long, replyingToId: Option[Long] = None): Future[Post] = {
+    val p = Post(content, threadId, creatorId, replyingToId)
+    val createQuery = (posts returning posts
+      .map(t => (t.content, t.threadId, t.creatorId, t.replyingToId, t.id, t.created, t.lastModified))) += p
+
+    db.run(createQuery).map(Post.tupled)
+  }
+
 }
