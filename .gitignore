@@ -90,7 +90,6 @@ Temporary Items
 
 ### PlayFramework ###
 # Ignore Play! working directory #
-bin/
 /db
 .eclipse
 /lib/
