@@ -1,8 +1,16 @@
-name := """Graphql Forum"""
+name := """Graphql-Forum"""
 
 version := "2.6.x"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file(".")).enablePlugins(PlayScala, DebianPlugin)
+
+resolvers += Resolver.sonatypeRepo("snapshots")
+maintainer in Linux := "Jeff Registre <jeffreyregistre@gmail.com>"
+
+packageSummary in Linux := "GraphQL Forum test bench with Sangria and Play framework."
+
+packageDescription := "GraphQL Api server built with Play framework and Sangria library."
+
 
 scalaVersion := "2.12.2"
 
